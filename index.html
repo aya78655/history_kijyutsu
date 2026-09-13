@@ -1,0 +1,954 @@
+<title>地理記述ドリル</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f1eee4;
+    --surface: #fbfaf5;
+    --surface-2: #e9e3d3;
+    --ink: #2a2823;
+    --ink-soft: #6b6559;
+    --ink-faint: #948d7c;
+    --border: #d9d2bf;
+    --accent: #1f5c73;
+    --accent-ink: #fbfaf5;
+    --accent-soft: #dbe9eb;
+    --contour: #8a5a34;
+    --correct: #3f7d53;
+    --correct-soft: #e1eee3;
+    --incorrect: #b8503e;
+    --incorrect-soft: #f5e2de;
+    --shadow: 0 1px 2px rgba(42,40,35,0.06), 0 8px 24px -12px rgba(42,40,35,0.18);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #191b19;
+      --surface: #232522;
+      --surface-2: #2c2e29;
+      --ink: #ece7da;
+      --ink-soft: #aca595;
+      --ink-faint: #7d7768;
+      --border: #3a3c36;
+      --accent: #64acc2;
+      --accent-ink: #0d1b1e;
+      --accent-soft: #223438;
+      --contour: #cd9563;
+      --correct: #74c28b;
+      --correct-soft: #1f2e22;
+      --incorrect: #e08e77;
+      --incorrect-soft: #33211c;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #191b19;
+    --surface: #232522;
+    --surface-2: #2c2e29;
+    --ink: #ece7da;
+    --ink-soft: #aca595;
+    --ink-faint: #7d7768;
+    --border: #3a3c36;
+    --accent: #64acc2;
+    --accent-ink: #0d1b1e;
+    --accent-soft: #223438;
+    --contour: #cd9563;
+    --correct: #74c28b;
+    --correct-soft: #1f2e22;
+    --incorrect: #e08e77;
+    --incorrect-soft: #33211c;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 24px -12px rgba(0,0,0,0.5);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Zen Kaku Gothic New', 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+
+  .page {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 2.25rem 1.25rem 4rem;
+  }
+
+  .masthead {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.75rem;
+  }
+
+  .masthead h1 {
+    font-family: 'Shippori Mincho', serif;
+    font-weight: 700;
+    font-size: 1.375rem;
+    letter-spacing: 0.02em;
+    margin: 0;
+    color: var(--contour);
+  }
+
+  .masthead .subtitle {
+    font-size: 0.8125rem;
+    color: var(--ink-faint);
+    letter-spacing: 0.04em;
+  }
+
+  /* ---- progress trail ---- */
+  .trail {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    margin: 0 0 1.75rem;
+    overflow-x: auto;
+    padding: 0.25rem 0.1rem;
+  }
+  .trail-step {
+    flex: 1 1 0;
+    min-width: 6px;
+    height: 6px;
+    border-radius: 3px;
+    background: var(--surface-2);
+    transition: background 0.25s ease;
+  }
+  .trail-step.done { background: var(--contour); }
+  .trail-step.correct { background: var(--correct); }
+  .trail-step.incorrect { background: var(--incorrect); }
+  .trail-step.current { background: var(--accent); }
+
+  .progress-label {
+    font-size: 0.75rem;
+    color: var(--ink-faint);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.03em;
+    margin-bottom: 0.5rem;
+  }
+
+  /* ---- cards ---- */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1.75rem;
+    box-shadow: var(--shadow);
+  }
+
+  .card + .card { margin-top: 1rem; }
+
+  .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin: 0 0 0.6rem;
+  }
+
+  .q-text {
+    font-size: 1.0625rem;
+    font-weight: 500;
+    text-wrap: balance;
+    margin: 0 0 0.4rem;
+    white-space: pre-wrap;
+  }
+
+  .q-limit {
+    font-size: 0.8125rem;
+    color: var(--ink-faint);
+    margin: 0 0 1.1rem;
+  }
+
+  textarea {
+    width: 100%;
+    min-height: 5.5rem;
+    resize: vertical;
+    background: var(--surface);
+    color: var(--ink);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.85rem 0.95rem;
+    font: inherit;
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+  textarea:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+    border-color: var(--accent);
+  }
+
+  .char-row {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 0.4rem;
+    font-size: 0.8rem;
+    color: var(--ink-faint);
+    font-variant-numeric: tabular-nums;
+  }
+  .char-row.over { color: var(--incorrect); font-weight: 700; }
+
+  .actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.6rem;
+    margin-top: 1.25rem;
+  }
+
+  button {
+    font: inherit;
+    font-weight: 700;
+    border: none;
+    border-radius: 999px;
+    padding: 0.65rem 1.4rem;
+    cursor: pointer;
+    transition: transform 0.12s ease, background 0.15s ease, opacity 0.15s ease;
+  }
+  button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  button:active { transform: scale(0.97); }
+  button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  .btn-primary {
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+  .btn-primary:hover:not(:disabled) { opacity: 0.92; }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--ink-soft);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { background: var(--surface-2); }
+
+  /* ---- verdict ---- */
+  .verdict-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 1rem;
+  }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    padding: 0.3rem 0.75rem;
+    border-radius: 999px;
+    letter-spacing: 0.02em;
+  }
+  .pill-correct { background: var(--correct-soft); color: var(--correct); }
+  .pill-incorrect { background: var(--incorrect-soft); color: var(--incorrect); }
+
+  .answer-block {
+    background: var(--surface-2);
+    border-radius: 10px;
+    padding: 0.9rem 1rem;
+    margin-top: 0.9rem;
+  }
+  .answer-block .label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--ink-faint);
+    letter-spacing: 0.04em;
+    margin: 0 0 0.3rem;
+  }
+  .answer-block .value {
+    margin: 0;
+    font-size: 0.95rem;
+  }
+  .your-answer { color: var(--ink-soft); }
+
+  .override-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1.1rem;
+    font-size: 0.8125rem;
+    color: var(--ink-faint);
+  }
+  .override-row .btn-toggle {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.85rem;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--ink-soft);
+  }
+  .override-row .btn-toggle.active-correct {
+    background: var(--correct-soft); color: var(--correct); border-color: transparent;
+  }
+  .override-row .btn-toggle.active-incorrect {
+    background: var(--incorrect-soft); color: var(--incorrect); border-color: transparent;
+  }
+
+  /* ---- intro / result screens ---- */
+  .hero-eyebrow {
+    font-size: 0.8125rem;
+    color: var(--contour);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+  }
+  .hero-title {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 1.9rem;
+    font-weight: 700;
+    margin: 0.4rem 0 0.9rem;
+    text-wrap: balance;
+  }
+  .hero-desc { color: var(--ink-soft); font-size: 0.98rem; margin: 0 0 1.4rem; }
+  .rule-list { margin: 0 0 1.6rem; padding: 0; list-style: none; display: grid; gap: 0.6rem; }
+  .rule-list li {
+    display: flex;
+    gap: 0.7rem;
+    align-items: flex-start;
+    font-size: 0.92rem;
+    color: var(--ink-soft);
+  }
+  .rule-mark {
+    flex: none;
+    width: 1.5rem; height: 1.5rem;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    color: var(--accent);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; font-weight: 700;
+  }
+
+  .score-hero {
+    text-align: center;
+    padding: 1rem 0 0.5rem;
+  }
+  .score-num {
+    font-family: 'Shippori Mincho', serif;
+    font-size: 3.4rem;
+    font-weight: 700;
+    color: var(--contour);
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  .score-num span { font-size: 1.4rem; color: var(--ink-faint); font-family: 'Zen Kaku Gothic New', sans-serif; }
+  .score-caption { color: var(--ink-soft); font-size: 0.9rem; margin-top: 0.5rem; }
+
+  .review-list { margin-top: 1.5rem; display: grid; gap: 0.6rem; }
+  .review-item {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--surface);
+  }
+  .review-item summary {
+    list-style: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.85rem 1rem;
+    font-size: 0.9rem;
+  }
+  .review-item summary::-webkit-details-marker { display: none; }
+  .review-item summary .qnum {
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-faint);
+    font-size: 0.8rem;
+    flex: none;
+    width: 1.6rem;
+  }
+  .review-item summary .qpreview {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: var(--ink);
+  }
+  .review-item .dot {
+    flex: none;
+    width: 8px; height: 8px; border-radius: 50%;
+  }
+  .dot.correct { background: var(--correct); }
+  .dot.incorrect { background: var(--incorrect); }
+  .review-item .review-body {
+    padding: 0 1rem 1rem;
+    border-top: 1px solid var(--border);
+    padding-top: 0.9rem;
+  }
+
+  .final-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 1.75rem;
+  }
+
+  .sr-only {
+    position: absolute; width: 1px; height: 1px;
+    padding: 0; margin: -1px; overflow: hidden;
+    clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+  }
+
+  .fade-in { animation: fadeIn 0.28s ease both; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+
+<div class="page">
+  <div class="masthead">
+    <h1>地理記述ドリル</h1>
+    <div class="subtitle" id="masthead-sub">中学受験 社会</div>
+  </div>
+
+  <div id="app"></div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var QUESTIONS = [
+    {
+      q: "北海道は広島・福井・鳥取など、他県の名にちなんだ地名がみられます。なぜこのような地名がみられるのですか。",
+      limit: 30,
+      model: "開拓のために移住してきた人々の出身地の名がつけられたから。",
+      groups: [
+        ["開拓", "移住", "入植", "移り住"],
+        ["出身", "故郷", "もとの土地", "生まれ"]
+      ]
+    },
+    {
+      q: "福岡市は九州地方最大の都市で、近年は人口が増えています。この都市の人口が増えている理由を答えなさい。",
+      limit: 25,
+      model: "福岡市は、九州の経済の中心で、会社が多いから。",
+      groups: [
+        ["中心", "会社", "企業", "仕事", "都市"]
+      ]
+    },
+    {
+      q: "関東地方の内陸部の県でつくられた自動車や機械などが茨城港から輸出されています。茨城港と関東内陸部の県が結びついた最も大きな理由を答えなさい。",
+      limit: 15,
+      model: "高速道路が開通したから。",
+      groups: [
+        ["高速道路", "高速"]
+      ]
+    },
+    {
+      q: "神戸港はかつて世界有数の貿易港でしたが、1995年に貨物の取扱量が大きく減りました。その理由をこのとき起きたできごとにふれながら答えなさい。",
+      limit: 30,
+      model: "阪神・淡路大震災によって、港の設備に大きな被害が出たから。",
+      groups: [
+        ["阪神", "淡路", "震災", "地震"],
+        ["被害", "壊れ", "破損", "損壊", "使えなく"]
+      ]
+    },
+    {
+      q: "沖縄県の農業生産額は九州地方で最も少なくなっています。その理由の1つとして稲作があまりさかんではないことがあげられます。沖縄県で稲作がさかんではない理由を土地の特色にふれながら説明しなさい。",
+      limit: 20,
+      model: "大きな川がなく、水持ちが悪い土地だから。",
+      groups: [
+        ["川", "水持ち", "水はけ", "サンゴ", "石灰岩", "保水"]
+      ]
+    },
+    {
+      q: "香川県は降水量の面でどのような特徴がありますか。またそのような特徴が見られるのはなぜですか。",
+      limit: 35,
+      model: "夏に四国山地、冬に中国山地が季節風をさえぎるため、降水量が少ない。",
+      groups: [
+        ["少ない", "少なく"],
+        ["山地", "山脈"]
+      ]
+    },
+    {
+      q: "奈良県は昔から林業がさかんです。トラックがないころに、山から切り出した材木はどのようにして海岸まで運ばれましたか。",
+      limit: 35,
+      model: "いかだに組んで、川に流して運ばれた。",
+      groups: [
+        ["いかだ", "組んで"],
+        ["川に流して"]
+      ]
+    },
+    {
+      q: "諏訪市はかつて養蚕がさかんでしたが、しだいにおとろえていったおもな理由をかんたんに説明しなさい。",
+      limit: 35,
+      model: "化学せんいが広まったから。外国から生糸が安く輸入されるようになったから。",
+      groups: [
+        ["化学せんい", "外国から"],
+        ["安く", "輸入"]
+      ]
+    },
+    {
+      q: "観光地の中には、目的地に向かう途中で観光客を自家用車から専用のバスなどに乗りかえさせているところがあります。このような方法をとっているのはなぜですか。その目的をふくめて答えなさい。",
+      limit: 20,
+      model: "排気ガスを減らし、自然環境を守るため。",
+      groups: [
+        ["排気ガス", "環境", "自然", "汚染", "渋滞"]
+      ]
+    },
+    {
+      q: "千葉県や埼玉県でおこなわれている近郊農業について、かんたんに説明しなさい。",
+      model: "大都市の周辺で、大都市向けの野菜などを作る農業",
+      groups: [
+        ["都市", "消費地"],
+        ["野菜", "出荷", "向け", "新鮮"]
+      ]
+    },
+    {
+      q: "排他的経済水域について、かんたんに説明しなさい。",
+      model: "沿岸国が魚や地下資源の権利を持つ水域",
+      groups: [
+        ["資源", "権利", "海里", "漁業"]
+      ]
+    },
+    {
+      q: "養殖漁業をおこなっている人たちが、川の上流で森林の保護や植林をおこなっています。このような人たちが「森は海の恋人」とよんでいる理由をかんたんに説明しなさい。",
+      model: "森林の養分が海のプランクトンを増やすから。",
+      groups: [
+        ["栄養", "養分"],
+        ["プランクトン", "魚", "豊か"]
+      ]
+    },
+    {
+      q: "水力発電所の多くが山沿いにつくられていることを考えて、水力発電のしくみを「ダム」ということばを使って説明しなさい。",
+      model: "川の上流につくったダムに水を貯めて、水が落ちる力で水車を回して電気を起こす。",
+      groups: [
+        ["ダム"],
+        ["水車", "タービン", "回転", "回し", "発電機", "発電", "落ち", "落下", "高低差"]
+      ]
+    },
+    {
+      q: "原子力発電所は多くの海水を必要とするため、海沿いにつくられています。どのようなことに使うため、多くの海水が必要なのか、かんたんに説明しなさい。",
+      model: "原子炉を冷やすために多くの海水が必要になる。",
+      groups: [
+        ["冷やす", "冷却"]
+      ]
+    },
+    {
+      q: "1960年代に起こったエネルギー革命について、かんたんに説明しなさい。",
+      model: "エネルギーの中心が石炭から石油に代わったこと。",
+      groups: [
+        ["石炭"],
+        ["石油"]
+      ]
+    },
+　  {
+      q: "沖縄県の家のつくりについて、特色をかんたんに説明しなさい。",
+      model: "家全体が低く建てられ、石垣や林で囲まれている。",
+      groups: [
+        ["低く"],
+        ["石垣"]
+      ]
+    },
+    {
+      q: "沖縄県の家は家全体が低く建てられ、石垣や林で囲まれています。その理由をかんたんに説明しなさい。",
+      model: "台風による強い風から家を守るため。",
+      groups: [
+        ["台風"],
+        ["守る"]
+      ]
+    },
+    {
+      q: "やませとは、どんな特徴をもつ風ですか。農業にあたえる影響もふくめて説明しなさい。",
+      model: "夏に北東から吹いてくる冷たくしめった風。長く拭き続けると夏でも気温が上がらず、米などが不作となる冷害を引き起こす。",
+      groups: [
+        ["北東", "冷たくしめった風"],
+        ["気温が上がらず", "不作", "冷害"]
+      ]
+    },
+    {
+      q: "自動車工場でおこなわれているジャストインタイム方式をかんたんに説明しなさい。",
+      model: "部品を必要な分だけ関連工場からすぐ運びこむしくみ。",
+      groups: [
+        ["部品"],
+        ["必要"]
+      ]
+    },
+    {
+      q: "石油化学コンビナートが海沿いにつくられている理由は何ですか。",
+      model: "原料の原油の輸入や製品の輸出に便利だから。",
+      groups: [
+        ["輸入", "原油", "輸出"]
+      ]
+    },
+    {
+      q: "ハイブリッドカーとはどのような自動車ですか。かんたんに説明しなさい。",
+      model: "ガソリンと電気を組み合わせて動く自動車",
+      groups: [
+        ["ガソリン"],
+        ["電気", "モーター"]
+      ]
+    },
+    {
+      q: "海外で現地生産をおこなうようになったため、国内では産業の空洞化が問題になっています。このことの例を2つあげなさい。",
+      model: "人々の働く場所が失われ、技術力が低下した。",
+      groups: [
+        ["失われ", "失業", "働く場所", "雇用", "職", "仕事"],
+        ["技術"]
+      ],
+      groupMode: "any"
+    },
+    {
+      q: "日本の人口を年齢別にみると「少子高齢化」になっています。この「少子高齢化」についてかんたんに説明しなさい。",
+      model: "総人口に占める子どもの割合が低くなる少子化と、高齢者の割合が高くなる高齢化が進んだ社会",
+      groups: [
+        ["子ども", "少子"],
+        ["高齢"]
+      ]
+    },
+    {
+      q: "宮崎平野では野菜の促成栽培がおこなわれています。宮崎平野が春先でもあたたかい理由をかんたんに説明しなさい。",
+      model: "暖流の黒潮の影響を受けているから。",
+      groups: [
+        ["黒潮", "暖流"]
+      ]
+    },
+    {
+      q: "鹿児島県のシラス台地で畑作がさかんになった理由をかんたんに説明しなさい。",
+      model: "火山灰地なので水もちが悪く、稲作に向いていないから。",
+      groups: [
+        ["火山灰", "シラス", "水もち", "水はけ"]
+      ]
+    },
+    {
+      q: "関西国際空港は、海の上にあるため、あることが可能となっています。あることとは何ですか。",
+      model: "24時間の離着陸をおこなうこと",
+      groups: [
+        ["24時間", "昼夜", "いつでも", "夜間"]
+      ]
+    },
+    {
+      q: "紀伊山地は林業がさかんです。伐採した木材を運び出すために、かつてはどのように運んでいましたか。",
+      model: "木材をいかだに組み、川に流して河口まで運んだ。",
+      groups: [
+        ["いかだ"],
+        ["川", "流し", "流して"]
+      ]
+    }
+  ];
+
+  var STORAGE_KEY = "chiri-kijutsu-drill-v1";
+
+  function countChars(s) {
+    return Array.from(s.trim()).length;
+  }
+
+  function normalize(s) {
+    return s.replace(/\s+/g, "");
+  }
+
+  function judge(q, answerRaw) {
+    var answer = normalize(answerRaw);
+    if (!answer) return false;
+    for (var i = 0; i < q.groups.length; i++) {
+      var group = q.groups[i];
+      var hit = group.some(function (kw) { return answer.indexOf(kw) !== -1; });
+      if (q.groupMode === "any") {
+        if (hit) return true;
+      } else {
+        if (!hit) return false;
+      }
+    }
+    return q.groupMode === "any" ? false : true;
+  }
+
+  function loadState() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return null;
+      var parsed = JSON.parse(raw);
+      if (!parsed || !Array.isArray(parsed.answers) || parsed.answers.length !== QUESTIONS.length) return null;
+      return parsed;
+    } catch (e) { return null; }
+  }
+
+  function saveState() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch (e) { /* ignore */ }
+  }
+
+  function clearState() {
+    try { localStorage.removeItem(STORAGE_KEY); } catch (e) { /* ignore */ }
+  }
+
+  var saved = loadState();
+  var state = saved || {
+    screen: "intro", // intro | question | result
+    index: 0,
+    answers: QUESTIONS.map(function () {
+      return { text: "", submitted: false, auto: null, final: null };
+    })
+  };
+
+  var app = document.getElementById("app");
+  var mastheadSub = document.getElementById("masthead-sub");
+
+  function render() {
+    if (state.screen === "intro") {
+      mastheadSub.textContent = "中学受験 社会";
+      renderIntro();
+    } else if (state.screen === "question") {
+      var doneCount = state.answers.filter(function (a) { return a.submitted; }).length;
+      mastheadSub.textContent = "第 " + (state.index + 1) + " 問 / 全 " + QUESTIONS.length + " 問";
+      renderQuestion();
+    } else {
+      mastheadSub.textContent = "結果";
+      renderResult();
+    }
+  }
+
+  function trailHTML() {
+    var steps = QUESTIONS.map(function (_, i) {
+      var a = state.answers[i];
+      var cls = "trail-step";
+      if (i === state.index && state.screen === "question") cls += " current";
+      else if (a.submitted) cls += a.final ? " correct" : " incorrect";
+      return '<div class="' + cls + '"></div>';
+    }).join("");
+    return '<div class="trail" aria-hidden="true">' + steps + '</div>';
+  }
+
+  function renderIntro() {
+    app.innerHTML =
+      '<div class="card fade-in">' +
+        '<p class="hero-eyebrow">GEOGRAPHY · 記述問題対策</p>' +
+        '<h2 class="hero-title">1問ずつ、自分の言葉で答えてみよう</h2>' +
+        '<p class="hero-desc">地理分野の記述問題を' + QUESTIONS.length + '問、順番に出題します。模範解答と完全一致しなくても、重要なキーワードが入っていれば正解と判定します。</p>' +
+        '<ul class="rule-list">' +
+          '<li><span class="rule-mark">1</span><span>字数制限がある問題は、入力欄の下に文字数が表示されます。</span></li>' +
+          '<li><span class="rule-mark">2</span><span>採点はキーワードの自動判定です。「惜しいのに不正解になった」という時は、ご自身で判定を上書きできます。</span></li>' +
+          '<li><span class="rule-mark">3</span><span>進行状況は自動で保存されます。途中で閉じても続きから再開できます。</span></li>' +
+        '</ul>' +
+        '<div class="actions" style="justify-content:flex-start">' +
+          '<button class="btn-primary" id="start-btn">' + (saved && saved.screen !== "intro" ? "続きから再開する" : "はじめる") + '</button>' +
+          (saved ? '<button class="btn-ghost" id="restart-fresh-btn">最初から始める</button>' : '') +
+        '</div>' +
+      '</div>';
+
+    document.getElementById("start-btn").addEventListener("click", function () {
+      if (!(saved && saved.screen !== "intro")) {
+        state.screen = "question";
+        state.index = 0;
+      } else {
+        state.screen = saved.screen;
+        state.index = saved.index;
+      }
+      saveState();
+      render();
+    });
+    var freshBtn = document.getElementById("restart-fresh-btn");
+    if (freshBtn) {
+      freshBtn.addEventListener("click", function () {
+        resetAll();
+      });
+    }
+  }
+
+  function resetAll() {
+    clearState();
+    state = {
+      screen: "question",
+      index: 0,
+      answers: QUESTIONS.map(function () {
+        return { text: "", submitted: false, auto: null, final: null };
+      })
+    };
+    saved = null;
+    render();
+  }
+
+  function renderQuestion() {
+    var i = state.index;
+    var q = QUESTIONS[i];
+    var a = state.answers[i];
+
+    var html = trailHTML();
+    html += '<div class="progress-label">' + (i + 1) + ' / ' + QUESTIONS.length + '</div>';
+    html += '<div class="card fade-in" aria-live="polite">';
+    html += '<p class="eyebrow">Q' + (i + 1) + '</p>';
+    html += '<p class="q-text">' + escapeHTML(q.q) + '</p>';
+    if (q.limit) {
+      html += '<p class="q-limit">' + q.limit + '字以内で答えなさい。</p>';
+    }
+
+    if (!a.submitted) {
+      html += '<textarea id="answer-input" placeholder="ここに解答を入力" aria-label="解答入力">' + escapeHTML(a.text) + '</textarea>';
+      html += '<div class="char-row" id="char-row"></div>';
+      html += '<div class="actions">';
+      if (i > 0) html += '<button class="btn-ghost" id="back-btn">戻る</button>';
+      html += '<button class="btn-primary" id="submit-btn">こたえる</button>';
+      html += '</div>';
+    } else {
+      html += renderFeedback(q, a);
+    }
+    html += '</div>';
+
+    app.innerHTML = html;
+
+    if (!a.submitted) {
+      var textarea = document.getElementById("answer-input");
+      var charRow = document.getElementById("char-row");
+      var submitBtn = document.getElementById("submit-btn");
+
+      function updateChar() {
+        var n = countChars(textarea.value);
+        if (q.limit) {
+          charRow.textContent = n + " / " + q.limit + " 字";
+          charRow.className = "char-row" + (n > q.limit ? " over" : "");
+        } else {
+          charRow.textContent = n + " 字";
+        }
+      }
+      textarea.addEventListener("input", updateChar);
+      updateChar();
+      textarea.focus();
+
+      submitBtn.addEventListener("click", function () {
+        var text = textarea.value;
+        a.text = text;
+        var result = judge(q, text);
+        a.auto = result;
+        a.final = result;
+        a.submitted = true;
+        saveState();
+        render();
+      });
+
+      var backBtn = document.getElementById("back-btn");
+      if (backBtn) {
+        backBtn.addEventListener("click", function () {
+          state.index = Math.max(0, state.index - 1);
+          saveState();
+          render();
+        });
+      }
+    } else {
+      wireFeedbackButtons(q, a);
+    }
+  }
+
+  function renderFeedback(q, a) {
+    var html = '<div class="fade-in">';
+    html += '<div class="verdict-row">';
+    html += a.final
+      ? '<span class="pill pill-correct">● 正解</span>'
+      : '<span class="pill pill-incorrect">○ 不正解</span>';
+    html += '</div>';
+
+    html += '<div class="answer-block">';
+    html += '<p class="label">あなたの解答</p>';
+    html += '<p class="value your-answer">' + (a.text.trim() ? escapeHTML(a.text) : "（無回答）") + '</p>';
+    html += '</div>';
+
+    html += '<div class="answer-block">';
+    html += '<p class="label">模範解答</p>';
+    html += '<p class="value">' + escapeHTML(q.model) + '</p>';
+    html += '</div>';
+
+    html += '<div class="override-row">';
+    html += '<span>判定を修正する：</span>';
+    html += '<button class="btn-toggle' + (a.final ? ' active-correct' : '') + '" id="mark-correct-btn" type="button">正解にする</button>';
+    html += '<button class="btn-toggle' + (!a.final ? ' active-incorrect' : '') + '" id="mark-incorrect-btn" type="button">不正解にする</button>';
+    html += '</div>';
+
+    html += '<div class="actions">';
+    html += '<button class="btn-ghost" id="redo-btn">もう一度入力する</button>';
+    html += '<button class="btn-primary" id="next-btn">' + (state.index === QUESTIONS.length - 1 ? "結果を見る" : "次へ") + '</button>';
+    html += '</div>';
+    html += '</div>';
+    return html;
+  }
+
+  function wireFeedbackButtons(q, a) {
+    document.getElementById("mark-correct-btn").addEventListener("click", function () {
+      a.final = true;
+      saveState();
+      render();
+    });
+    document.getElementById("mark-incorrect-btn").addEventListener("click", function () {
+      a.final = false;
+      saveState();
+      render();
+    });
+    document.getElementById("redo-btn").addEventListener("click", function () {
+      a.submitted = false;
+      a.auto = null;
+      a.final = null;
+      saveState();
+      render();
+    });
+    document.getElementById("next-btn").addEventListener("click", function () {
+      if (state.index < QUESTIONS.length - 1) {
+        state.index += 1;
+        saveState();
+        render();
+      } else {
+        state.screen = "result";
+        saveState();
+        render();
+      }
+    });
+  }
+
+  function renderResult() {
+    var correctCount = state.answers.filter(function (a) { return a.final; }).length;
+    var html = '<div class="card fade-in">';
+    html += '<div class="score-hero">';
+    html += '<p class="hero-eyebrow">RESULT</p>';
+    html += '<div class="score-num">' + correctCount + '<span> / ' + QUESTIONS.length + ' 問正解</span></div>';
+    html += '<p class="score-caption">' + resultCaption(correctCount) + '</p>';
+    html += '</div>';
+
+    html += '<div class="review-list">';
+    QUESTIONS.forEach(function (q, i) {
+      var a = state.answers[i];
+      html += '<details class="review-item">';
+      html += '<summary>';
+      html += '<span class="qnum">Q' + (i + 1) + '</span>';
+      html += '<span class="dot ' + (a.final ? 'correct' : 'incorrect') + '"></span>';
+      html += '<span class="qpreview">' + escapeHTML(q.q) + '</span>';
+      html += '</summary>';
+      html += '<div class="review-body">';
+      html += '<div class="answer-block"><p class="label">あなたの解答</p><p class="value your-answer">' + (a.text.trim() ? escapeHTML(a.text) : "（無回答）") + '</p></div>';
+      html += '<div class="answer-block"><p class="label">模範解答</p><p class="value">' + escapeHTML(q.model) + '</p></div>';
+      html += '</div>';
+      html += '</details>';
+    });
+    html += '</div>';
+
+    html += '<div class="final-actions"><button class="btn-primary" id="restart-btn">もう一度挑戦する</button></div>';
+    html += '</div>';
+
+    app.innerHTML = html;
+    document.getElementById("restart-btn").addEventListener("click", resetAll);
+  }
+
+  function resultCaption(n) {
+    var total = QUESTIONS.length;
+    var ratio = n / total;
+    if (ratio === 1) return "全問正解です！この調子で進めましょう。";
+    if (ratio >= 0.8) return "よくできました。間違えた問題を見直しておきましょう。";
+    if (ratio >= 0.5) return "もう少しです。模範解答と見比べて復習しましょう。";
+    return "これから伸びます。模範解答を読んでもう一度挑戦してみましょう。";
+  }
+
+  function escapeHTML(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  render();
+})();
+</script>
